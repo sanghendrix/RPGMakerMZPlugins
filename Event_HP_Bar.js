@@ -1,7 +1,7 @@
 /*:
  * @plugindesc HP Bar for events with notetag <hp: x>
  * @plugindesc Event_HP_Bar
- * @author YourName
+ * @author SangHendrix & ChatGPT
  * 
  * @param barWidth
  * @text Bar Width
