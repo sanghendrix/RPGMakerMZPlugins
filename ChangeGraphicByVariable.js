@@ -1,5 +1,5 @@
 /*:
- * @plugindesc [Ver 1.0] Change character graphic using a variable
+ * @plugindesc [Ver 1.0.1] Change character graphic using a variable
  *
  * @author Sang Hendrix & ChatGPT
  *
@@ -62,7 +62,15 @@ function changeCharacterPattern(pattern) {
     const character = $gamePlayer;
     character._originalPattern = pattern;
     character._pattern = pattern;
+    character._patternUpdated = true;
+    togglePatternReset.call(character, true);
 }
+
+Game_CharacterBase.prototype.resetPattern = function() {
+    if (!this._disablePatternReset) {
+        this._pattern = this._originalPattern;
+    }
+};
 
 Game_CharacterBase.prototype.updatePattern = function() {
     if (!this._disablePatternReset) {
@@ -71,10 +79,26 @@ Game_CharacterBase.prototype.updatePattern = function() {
         } else {
             this._pattern = (this._pattern + 1) % this.maxPattern();
         }
+    } else if (!this._patternUpdated) {
+        this._pattern = this._originalPattern;
     }
 };
 
 function togglePatternReset(disable) {
     const character = $gamePlayer;
     character._disablePatternReset = disable;
+    if (!disable) {
+        character._patternUpdated = false;
+    }
 }
+
+Game_CharacterBase.prototype.setDirection = function(d) {
+    if (!this.isDirectionFixed() && d) {
+        this._direction = d;
+    }
+
+    // Cập nhật pattern sau khi thay đổi hướng di chuyển
+    if (this._disablePatternReset && this._patternUpdated) {
+        this.updatePattern();
+    }
+};
