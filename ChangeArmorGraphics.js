@@ -36,7 +36,7 @@
 */
 
 (function() {
-    var parameters = PluginManager.parameters('ChangeArmorGraphic');
+    var parameters = PluginManager.parameters('ChangeArmorGraphics');
     var graphicList = JSON.parse(parameters['Graphic List']).map(JSON.parse);
     var enableSwitch = Number(parameters['Enable Switch']);
   
