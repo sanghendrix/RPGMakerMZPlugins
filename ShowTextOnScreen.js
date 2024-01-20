@@ -166,28 +166,25 @@
 
         async refresh() {
             this.bitmap.clear();
-
-            let localizedText = this._text;
-
-            if (typeof DKTools !== 'undefined' && typeof DKTools.Localization !== 'undefined' && typeof DKTools.Localization.Manager !== 'undefined') {
-                localizedText = await DKTools.Localization.Manager.localizeAsync(this._text);
-            }
-
+        
+            // Directly using the text from the argument
+            let textToDisplay = this._text;
+        
             this.bitmap.fontSize = parseInt(this._fontSize);
             this.bitmap.fontFace = this._fontFace;
             this.bitmap.textColor = this._textColor;
-
+        
             if (this._outlineEnabled) {
                 this.bitmap.outlineColor = this._outlineColor;
                 this.bitmap.outlineWidth = 3;
             } else {
                 this.bitmap.outlineWidth = 0;
             }
-
+        
             const width = Graphics.width;
             let baseTextX;
             let y;
-
+        
             if (this._x === 'center') {
                 baseTextX = 0;
             } else if (this._x === 'player'){
@@ -195,23 +192,24 @@
             } else {
                 baseTextX = parseInt(this._x) + xOffset;
             }
-
+        
             if (this._y === 'player') {
-                y = $gamePlayer.screenY() + xOffset;
+                y = $gamePlayer.screenY() + yOffset;
             }
             else {
                 y = parseInt(this._y) + yOffset;
             }
-
+        
+            // Check if convText function exists in PluginManager and use it if available
+            let finalText = (typeof PluginManager.convText === 'function') ? PluginManager.convText(textToDisplay) : textToDisplay;
+        
             if (this._x === 'center') {
-                this.bitmap.drawText(PluginManager.convText(localizedText), baseTextX, y, width, Graphics.height, 'center');
+                this.bitmap.drawText(finalText, baseTextX, y, width, Graphics.height, 'center');
             } else if (this._x === 'player'){
-                this.bitmap.drawText(PluginManager.convText(localizedText), baseTextX, y, width, Graphics.height, 'left');
+                this.bitmap.drawText(finalText, baseTextX, y, width, Graphics.height, 'left');
             }  else {
-                this.bitmap.drawText(PluginManager.convText(localizedText), baseTextX, y, width, Graphics.height, 'left');
+                this.bitmap.drawText(finalText, baseTextX, y, width, Graphics.height, 'left');
             }
-
-            
         }
     }
 
