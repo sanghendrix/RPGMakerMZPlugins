@@ -1,6 +1,6 @@
 /*:
 * @target MZ
-* @plugindesc v1.0.1 This plugin helps you to show text on the screen by using the plugin command. 
+* @plugindesc v1.0.2 This plugin helps you to show text on the screen by using the plugin command. 
 * Can be used for questing, notification, etc.
 * @author Sang Hendrix & AI
 * 
@@ -66,10 +66,10 @@
 * @desc Font size
 *
 * @arg fontFace
-* @type string
-* @default GameFont
-* @text Font Namne
-* @desc Font Name
+* @type text
+* @default rmmz-mainfont
+* @text Font File name
+* @desc Font File name inside fonts folder without extension. Supports: TTF or OTF.
 *
 * @arg textColor
 * @type string
@@ -128,11 +128,15 @@
             this._textColor = textColor;
             this._outlineEnabled = outlineEnabled;
             this._outlineColor = outlineColor;
-
+    
             this.z = 100;
+            this.bitmap.fontFace = fontFace;
+            this.loadCustomFont(fontFace);
             this.refresh();
             this._sfx = sfx;
             this.opacity = 0;
+    
+            this.loadCustomFont(fontFace);
 
             setTimeout(() => {
                 const fadeInInterval = setInterval(() => {
@@ -142,7 +146,7 @@
                     }
                 }, 1000 / 60); 
             }, 0);
-
+    
             setTimeout(() => {
                 const fadeOutInterval = setInterval(() => {
                     this.opacity -= 255 / (fadeDuration / (1000 / 60));
@@ -152,7 +156,7 @@
                     }
                 }, 1000 / 60);
             }, duration);
-
+    
             if (this._sfx) {
                 const sound = {
                     name: this._sfx,
@@ -162,6 +166,22 @@
                 };
                 AudioManager.playSe(sound);
             }
+            
+        }
+
+        loadCustomFont(fontFileName) {
+            const extensions = ['.ttf', '.otf'];
+            extensions.forEach(extension => {
+                const fontUrl = `fonts/${fontFileName}${extension}`;
+                const fontFace = new FontFace(this._fontFace, `url(${fontUrl})`);
+                document.fonts.add(fontFace);
+                fontFace.load().then(() => {
+                    this.bitmap.fontFace = this._fontFace;
+                    this.refresh();
+                }).catch(() => {
+                    console.error(`Failed to load font: ${fontUrl}`);
+                });
+            });
         }
 
         async refresh() {
