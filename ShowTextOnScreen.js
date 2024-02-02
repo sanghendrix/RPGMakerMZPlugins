@@ -170,20 +170,32 @@
         }
 
         loadCustomFont(fontFileName) {
-            const extensions = ['.ttf', '.otf'];
-            extensions.forEach(extension => {
-                const fontUrl = `fonts/${fontFileName}${extension}`;
-                const fontFace = new FontFace(this._fontFace, `url(${fontUrl})`);
-                document.fonts.add(fontFace);
-                fontFace.load().then(() => {
-                    this.bitmap.fontFace = this._fontFace;
-                    this.refresh();
-                }).catch(() => {
-                    console.error(`Failed to load font: ${fontUrl}`);
+            if (fontFileName === 'rmmz-mainfont') {
+                this.bitmap.fontFace = $dataSystem.advanced.mainFontFilename || 'GameFont';
+                this.refresh();
+            } else {
+                const extensions = ['.ttf', '.otf'];
+                let fontLoaded = false;
+        
+                extensions.forEach(extension => {
+                    if (!fontLoaded) {
+                        const fontUrl = `fonts/${fontFileName}${extension}`;
+                        const fontFace = new FontFace(fontFileName, `url(${fontUrl})`);
+                        document.fonts.add(fontFace);
+                        fontFace.load().then(() => {
+                            if (!fontLoaded) {
+                                this.bitmap.fontFace = fontFileName;
+                                fontLoaded = true; 
+                                this.refresh();
+                            }
+                        }).catch(() => {
+                            console.error(`Failed to load font: ${fontUrl}`);
+                        });
+                    }
                 });
-            });
+            }
         }
-
+        
         async refresh() {
             this.bitmap.clear();
         
